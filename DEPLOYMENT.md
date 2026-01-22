@@ -19,14 +19,25 @@ railway up
 # Create Heroku app
 heroku create your-app-name
 
+# Set buildpacks (important!)
+heroku buildpacks:add heroku/python
+
 # Set environment variables
 heroku config:set SECRET_KEY=your-secret-key
 heroku config:set DEBUG=False
-# ... set other env vars
+heroku config:set DATABASE_URL=your-database-url
+# ... set other env vars from .env.example
 
 # Deploy
-git push heroku main
+git push heroku master
 ```
+
+### 3. **Render**
+- Connect GitHub repository
+- **Build Command**: `pip install -r requirements.txt && python manage.py collectstatic --noinput`
+- **Start Command**: `gunicorn --config gunicorn.conf.py core.wsgi:application`
+- Add environment variables from `.env.example`
+- Set Python version to 3.11.9
 
 ### 3. **Render**
 - Connect GitHub repository
@@ -54,16 +65,14 @@ Copy `.env.example` to `.env` and fill in:
 - `DEBUG=False` for production
 - Database URL for production database
 
-## 🔧 Production Checklist
+## 🔧 Production Configuration Files
 
-- [ ] Set `DEBUG=False`
-- [ ] Use production database (PostgreSQL)
-- [ ] Set up Redis for WebSockets
-- [ ] Configure static file serving
-- [ ] Set up HTTPS
-- [ ] Configure proper logging
-- [ ] Set up monitoring
-- [ ] Configure backup strategy
+Your repository includes production-ready configuration:
+
+- **`Procfile`**: Process definitions for Heroku/Railway
+- **`gunicorn.conf.py`**: Gunicorn server configuration
+- **`runtime.txt`**: Python version specification (3.11.9)
+- **`core/wsgi.py`**: Production WSGI application
 
 ## 🌐 Domain & SSL
 
