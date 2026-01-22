@@ -32,12 +32,14 @@ heroku config:set DATABASE_URL=your-database-url
 git push heroku master
 ```
 
-### 3. **Render**
+### 3. **Render** (Free tier available)
 - Connect GitHub repository
-- **Build Command**: `pip install -r requirements.txt && python manage.py collectstatic --noinput`
+- **Runtime**: Python 3.11.9
+- **Build Command**: `pip install -r requirements.txt && python manage.py collectstatic --noinput --clear`
 - **Start Command**: `gunicorn --config gunicorn.conf.py core.wsgi:application`
-- Add environment variables from `.env.example`
-- Set Python version to 3.11.9
+- **Environment Variables**: Set all from `.env.example`
+- **Database**: PostgreSQL (Render provides free PostgreSQL)
+- Set `DATABASE_URL` to your Render PostgreSQL connection string
 
 ### 3. **Render**
 - Connect GitHub repository
@@ -59,11 +61,12 @@ vercel --prod
 Copy `.env.example` to `.env` and fill in:
 
 - `SECRET_KEY`: Generate with `python -c "import secrets; print(secrets.token_urlsafe(50))"`
+- `DATABASE_URL`: SQLite for dev, PostgreSQL URL for production
 - `OPENAI_API_KEY`: From OpenAI Platform
 - `SAMBA_NOVA_API_KEY`: From SambaNova
 - `GEMINI_API_KEY`: From Google AI Studio
 - `DEBUG=False` for production
-- Database URL for production database
+- `ALLOWED_HOSTS`: Your domain for production
 
 ## 🔧 Production Configuration Files
 
