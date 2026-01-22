@@ -1,0 +1,354 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ problem.title }} - CodeInterview Pro{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <!-- Header -->
+    <div class="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-4">
+                    <a href="{% url 'practice' %}" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </a>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-900 dark:text-white">{{ problem.title }}</h1>
+                        <div class="flex items-center space-x-2 mt-1">
+                            <span class="px-2 py-1 rounded-full text-xs font-medium
+                                {% if problem.difficulty == 'easy' %}bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200
+                                {% elif problem.difficulty == 'medium' %}bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200
+                                {% else %}bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200{% endif %}">
+                                {{ problem.get_difficulty_display }}
+                            </span>
+                            {% for topic in problem.topics.all %}
+                            <span class="px-2 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-xs font-medium">
+                                {{ topic.name }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    {% if progress %}
+                        <div class="text-sm text-gray-600 dark:text-gray-400">
+                            Status: <span class="font-medium
+                                {% if progress.status == 'solved' %}text-green-600 dark:text-green-400
+                                {% elif progress.status == 'attempted' %}text-yellow-600 dark:text-yellow-400
+                                {% else %}text-gray-600 dark:text-gray-400{% endif %}">
+                                {{ progress.get_status_display }}
+                            </span>
+                        </div>
+                    {% endif %}
+                    <div class="text-sm text-gray-600 dark:text-gray-400">
+                        {{ problem.accepted_submissions_count }} solutions
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <!-- Problem Description -->
+            <div class="space-y-6">
+                <!-- Problem Statement -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                    <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Problem Statement</h2>
+                    <div class="prose prose-gray dark:prose-invert max-w-none">
+                        <p class="text-gray-700 dark:text-gray-300 leading-relaxed">{{ problem.description }}</p>
+                    </div>
+                </div>
+
+                <!-- Constraints -->
+                {% if problem.constraints %}
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Constraints</h3>
+                    <div class="prose prose-gray dark:prose-invert max-w-none">
+                        {{ problem.constraints|safe }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Sample Test Cases -->
+                {% if sample_test_cases %}
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Examples</h3>
+                    {% for test_case in sample_test_cases %}
+                    <div class="mb-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h4 class="font-medium text-gray-900 dark:text-white mb-2">Input:</h4>
+                                <pre class="bg-gray-100 dark:bg-gray-600 p-3 rounded text-sm font-mono text-gray-800 dark:text-gray-200 overflow-x-auto">{{ test_case.input_data }}</pre>
+                            </div>
+                            <div>
+                                <h4 class="font-medium text-gray-900 dark:text-white mb-2">Output:</h4>
+                                <pre class="bg-gray-100 dark:bg-gray-600 p-3 rounded text-sm font-mono text-gray-800 dark:text-gray-200 overflow-x-auto">{{ test_case.expected_output }}</pre>
+                            </div>
+                        </div>
+                        {% if test_case.explanation %}
+                        <div class="mt-3">
+                            <h4 class="font-medium text-gray-900 dark:text-white mb-1">Explanation:</h4>
+                            <p class="text-gray-700 dark:text-gray-300 text-sm">{{ test_case.explanation }}</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Hints -->
+                {% if problem.hints %}
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Hints</h3>
+                    <div class="space-y-2">
+                        {% for hint in problem.hints.all %}
+                        <details class="group">
+                            <summary class="cursor-pointer text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium">
+                                Hint {{ forloop.counter }}
+                            </summary>
+                            <p class="mt-2 text-gray-700 dark:text-gray-300">{{ hint.content }}</p>
+                        </details>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Code Editor -->
+            <div class="space-y-6">
+                <!-- Language Selector -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Code Editor</h3>
+                        <select id="language-select" class="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white">
+                            {% for language in languages %}
+                            <option value="{{ language.id }}" {% if forloop.first %}selected{% endif %}>{{ language.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <!-- Code Editor Area -->
+                    <div class="relative">
+                        <textarea id="code-editor" class="w-full h-96 p-4 font-mono text-sm border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white resize-none" placeholder="Write your solution here...">{{ problem.template_code }}</textarea>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex items-center justify-between mt-4">
+                        <div class="flex space-x-3">
+                            <button id="run-tests" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors">
+                                Run Tests
+                            </button>
+                            <button id="submit-solution" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-medium transition-colors">
+                                Submit Solution
+                            </button>
+                        </div>
+                        <div class="text-sm text-gray-600 dark:text-gray-400">
+                            Time Limit: {{ problem.time_limit }}ms | Memory: {{ problem.memory_limit }}MB
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Test Results -->
+                <div id="test-results" class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6 hidden">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Test Results</h3>
+                    <div id="results-content"></div>
+                </div>
+
+                <!-- Recent Submissions -->
+                {% if recent_submissions %}
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Recent Submissions</h3>
+                    <div class="space-y-3">
+                        {% for submission in recent_submissions %}
+                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <span class="px-2 py-1 rounded-full text-xs font-medium
+                                    {% if submission.status == 'accepted' %}bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200
+                                    {% elif submission.status == 'wrong_answer' %}bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200
+                                    {% else %}bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200{% endif %}">
+                                    {{ submission.get_status_display }}
+                                </span>
+                                <span class="text-sm text-gray-600 dark:text-gray-400">{{ submission.language.name }}</span>
+                            </div>
+                            <span class="text-sm text-gray-500 dark:text-gray-400">{{ submission.submitted_at|date:"M d, H:i" }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- WebSocket connection for real-time feedback -->
+<script>
+    let ws = null;
+    let reconnectAttempts = 0;
+    const maxReconnectAttempts = 5;
+
+    function connectWebSocket() {
+        if (reconnectAttempts >= maxReconnectAttempts) {
+            console.log('Max reconnection attempts reached');
+            return;
+        }
+
+        try {
+            ws = new WebSocket('ws://' + window.location.host + '/ws/coding/{{ problem.id }}/');
+
+            ws.onopen = function(event) {
+                console.log('WebSocket connected');
+                reconnectAttempts = 0;
+            };
+
+            ws.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data);
+            };
+
+            ws.onclose = function(event) {
+                console.log('WebSocket disconnected');
+                setTimeout(() => {
+                    reconnectAttempts++;
+                    connectWebSocket();
+                }, 1000 * reconnectAttempts);
+            };
+
+            ws.onerror = function(error) {
+                console.error('WebSocket error:', error);
+            };
+        } catch (error) {
+            console.error('Failed to connect WebSocket:', error);
+        }
+    }
+
+    function handleWebSocketMessage(data) {
+        const resultsDiv = document.getElementById('test-results');
+        const resultsContent = document.getElementById('results-content');
+
+        if (data.type === 'test_results') {
+            resultsDiv.classList.remove('hidden');
+            resultsContent.innerHTML = generateResultsHTML(data.results);
+        } else if (data.type === 'execution_error') {
+            resultsDiv.classList.remove('hidden');
+            resultsContent.innerHTML = `<div class="text-red-600 dark:text-red-400">${data.message}</div>`;
+        }
+    }
+
+    function generateResultsHTML(results) {
+        let html = '<div class="space-y-3">';
+
+        results.forEach((result, index) => {
+            const statusClass = result.status === 'accepted' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400';
+            const bgClass = result.status === 'accepted' ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20';
+
+            html += `
+                <div class="p-4 ${bgClass} rounded-lg">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="font-medium ${statusClass}">Test Case ${index + 1}</span>
+                        <span class="text-sm ${statusClass}">${result.status}</span>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                        <div>
+                            <strong>Input:</strong>
+                            <pre class="mt-1 bg-gray-100 dark:bg-gray-600 p-2 rounded text-xs overflow-x-auto">${result.input}</pre>
+                        </div>
+                        <div>
+                            <strong>Expected:</strong>
+                            <pre class="mt-1 bg-gray-100 dark:bg-gray-600 p-2 rounded text-xs overflow-x-auto">${result.expected_output}</pre>
+                        </div>
+                    </div>
+                    ${result.actual_output ? `
+                    <div class="mt-2">
+                        <strong>Your Output:</strong>
+                        <pre class="mt-1 bg-gray-100 dark:bg-gray-600 p-2 rounded text-xs overflow-x-auto">${result.actual_output}</pre>
+                    </div>
+                    ` : ''}
+                    <div class="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                        Time: ${result.execution_time}ms | Memory: ${result.memory_used}KB
+                    </div>
+                </div>
+            `;
+        });
+
+        html += '</div>';
+        return html;
+    }
+
+    // Event listeners
+    document.getElementById('run-tests').addEventListener('click', function() {
+        const code = document.getElementById('code-editor').value;
+        const languageId = document.getElementById('language-select').value;
+
+        if (!code.trim()) {
+            alert('Please write some code first!');
+            return;
+        }
+
+        // Send code to WebSocket for testing
+        if (ws && ws.readyState === WebSocket.OPEN) {
+            ws.send(JSON.stringify({
+                type: 'run_tests',
+                code: code,
+                language_id: languageId
+            }));
+        } else {
+            alert('Connection lost. Please refresh the page.');
+        }
+    });
+
+    document.getElementById('submit-solution').addEventListener('click', function() {
+        const code = document.getElementById('code-editor').value;
+        const languageId = document.getElementById('language-select').value;
+
+        if (!code.trim()) {
+            alert('Please write some code first!');
+            return;
+        }
+
+        // Submit solution via AJAX
+        fetch('/api/coding/submissions/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+            },
+            body: JSON.stringify({
+                problem: {{ problem.id }},
+                language: languageId,
+                code: code
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.id) {
+                // Execute the submission
+                return fetch(`/api/coding/submissions/${data.id}/execute/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                });
+            } else {
+                throw new Error('Failed to create submission');
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            handleWebSocketMessage({ type: 'test_results', results: data.results });
+            alert(data.status === 'accepted' ? 'Congratulations! Solution accepted!' : 'Solution failed. Check test results.');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+        });
+    });
+
+    // Initialize WebSocket connection
+    connectWebSocket();
+</script>
+{% endblock %}
