@@ -17,4 +17,4 @@ django.setup()
 from django_vercel import handler
 
 # Export the handler function
-app = handler
+app = get_wsgi_application()
