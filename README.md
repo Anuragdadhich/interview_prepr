@@ -193,6 +193,31 @@ python manage.py populate_sample_data
 
 ## Deployment
 
+### Vercel Deployment
+
+1. **Install Vercel CLI**
+   ```bash
+   npm install -g vercel
+   ```
+
+2. **Deploy to Vercel**
+   ```bash
+   vercel
+   ```
+
+3. **Set Environment Variables in Vercel Dashboard**
+   - Go to your project in Vercel dashboard
+   - Navigate to Settings > Environment Variables
+   - Add all the environment variables from your `.env` file
+
+4. **Database Configuration**
+   - Use a cloud database like PostgreSQL on Railway, PlanetScale, or Supabase
+   - Update `DATABASE_URL` environment variable
+
+5. **Static Files**
+   - Static files are automatically collected during build
+   - Served directly by Vercel CDN
+
 ### Production Checklist
 - [ ] Set `DEBUG=False`
 - [ ] Configure production database (PostgreSQL)

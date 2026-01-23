@@ -27,7 +27,12 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',')
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',') + [
+    'localhost',
+    '127.0.0.1',
+    '.vercel.app',
+    '.now.sh',
+]
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -219,7 +224,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
-]
+] + [f"https://{host}" for host in ALLOWED_HOSTS if host.endswith('.vercel.app') or host.endswith('.now.sh')]
 
 CORS_ALLOW_CREDENTIALS = True
 
