@@ -30,8 +30,7 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='').split(',') + [
     'localhost',
     '127.0.0.1',
-    '.vercel.app',
-    '.now.sh',
+    '.fly.dev',
 ]
 
 # Default primary key field type
@@ -224,7 +223,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:3000",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
-] + [f"https://{host}" for host in ALLOWED_HOSTS if host.endswith('.vercel.app') or host.endswith('.now.sh')]
+] + [f"https://{host}" for host in ALLOWED_HOSTS if host.endswith('.fly.dev')]
 
 CORS_ALLOW_CREDENTIALS = True
 

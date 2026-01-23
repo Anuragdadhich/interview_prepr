@@ -193,36 +193,60 @@ python manage.py populate_sample_data
 
 ## Deployment
 
-### Vercel Deployment
+### Fly.io Deployment
 
-1. **Install Vercel CLI**
+1. **Install Fly CLI**
    ```bash
-   npm install -g vercel
+   # On Windows
+   powershell -Command "iwr https://fly.io/install.ps1 -useb | iex"
+   
+   # On macOS/Linux
+   curl -L https://fly.io/install.sh | sh
    ```
 
-2. **Deploy to Vercel**
+2. **Login to Fly.io**
    ```bash
-   vercel
+   fly auth login
    ```
 
-3. **Set Environment Variables in Vercel Dashboard**
-   - Go to your project in Vercel dashboard
-   - Navigate to Settings > Environment Variables
-   - Add all the environment variables from your `.env` file
+3. **Launch the application**
+   ```bash
+   fly launch
+   ```
+   - Choose your app name (or use the default)
+   - Select the region closest to you
+   - Choose "No" when asked about adding a database (we'll add it separately)
 
-4. **Database Configuration**
-   - Use a cloud database like PostgreSQL on Railway, PlanetScale, or Supabase
-   - Update `DATABASE_URL` environment variable
+4. **Set Environment Variables**
+   ```bash
+   fly secrets set SECRET_KEY="your-secret-key-here"
+   fly secrets set DEBUG="False"
+   fly secrets set DATABASE_URL="your-database-url"
+   fly secrets set GEMINI_API_KEY="your-gemini-key"
+   # Add other API keys as needed
+   ```
 
-5. **Static Files**
-   - Static files are automatically collected during build
-   - Served directly by Vercel CDN
+5. **Set up PostgreSQL Database**
+   ```bash
+   fly postgres create
+   fly postgres attach <postgres-app-name>
+   ```
+
+6. **Deploy**
+   ```bash
+   fly deploy
+   ```
+
+7. **Scale the application (optional)**
+   ```bash
+   fly scale count 1
+   ```
 
 ### Production Checklist
 - [ ] Set `DEBUG=False`
 - [ ] Configure production database (PostgreSQL)
 - [ ] Set up proper static file serving
-- [ ] Configure HTTPS
+- [ ] Configure HTTPS (automatic on Fly.io)
 - [ ] Set up monitoring and logging
 - [ ] Configure backup strategy
 - [ ] Set up CI/CD pipeline
