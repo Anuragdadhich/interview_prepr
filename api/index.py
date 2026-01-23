@@ -13,8 +13,8 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 import django
 django.setup()
 
-# Import the Vercel handler
-from django_vercel import handler
+# Import Django's WSGI application
+from django.core.wsgi import get_wsgi_application
 
-# Export the handler function
+# Export the WSGI application
 app = get_wsgi_application()
